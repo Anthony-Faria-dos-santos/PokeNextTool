@@ -1,8 +1,15 @@
-/* import dotenv from "dotenv"; */ //! A supprimer avant mise en prod.
+/* import dotenv from "dotenv";
+dotenv.config(); 
+ */
 import { Pool } from "pg";
 import { PokemonData, PokemonType, TypeInfo } from "./definitions"; // Ajout de TypeInfo
-/* dotenv.config(); */ //! A supprimer avant mise en prod.
-
+// Import des schémas Zod
+import {
+  PokemonListSchema,
+  PokemonDataSchema,
+  TypeInfoListSchema,
+} from "./schemas";
+import { configDotenv } from "dotenv";
 // Configuration de la connexion à la base de données
 // Les variables d'environnement sont utilisées par défaut par le constructeur de Pool
 // PGUSER, PGHOST, PGDATABASE, PGPASSWORD, PGPORT
@@ -53,8 +60,19 @@ export async function fetchPokemonList(): Promise<PokemonData[]> {
     `;
     const { rows } = await pool.query(query);
 
-    // Mapper les résultats pour correspondre à l'interface PokemonData
-    const pokemonList: PokemonData[] = rows.map((row) => ({
+    // Validation avec Zod
+    const validationResult = PokemonListSchema.safeParse(rows);
+
+    if (!validationResult.success) {
+      console.error(
+        "Erreur de validation Zod pour fetchPokemonList:",
+        validationResult.error.format()
+      );
+      throw new Error(
+        "Les données des Pokémon reçues de la base de données sont invalides."
+      );
+    }
+    const pokemonList: PokemonData[] = validationResult.data.map((row) => ({
       id: row.id,
       nom: row.nom,
       numero: row.numero,
@@ -64,17 +82,18 @@ export async function fetchPokemonList(): Promise<PokemonData[]> {
       attaque_spe: row.attaque_spe,
       defense_spe: row.defense_spe,
       vitesse: row.vitesse,
-      types: row.types as PokemonType[], // Le JSON_AGG retourne déjà le bon format
+      types: row.types as PokemonType[],
     }));
 
     return pokemonList;
   } catch (error) {
+    if (error instanceof Error && error.message.includes("invalides")) {
+      throw error;
+    }
     console.error(
       "Erreur lors de la récupération de la liste des Pokémon:",
       error
     );
-    // Dans un cas réel, vous pourriez vouloir logger l'erreur dans un service de monitoring
-    // et/ou retourner une erreur plus conviviale ou un tableau vide.
     throw new Error("Impossible de récupérer la liste des Pokémon.");
   }
 }
@@ -101,7 +120,7 @@ export async function fetchPokemonDetail(
             JOIN type t ON pt.type_id = t.id
             WHERE pt.pokemon_numero = p.numero
           ),
-          '[]'::json
+          '['::json
         ) AS types
       FROM pokemon p
       WHERE p.numero = $1; -- Utilisation d'un paramètre pour le numéro
@@ -113,21 +132,36 @@ export async function fetchPokemonDetail(
     }
 
     const row = rows[0];
+    const validationResult = PokemonDataSchema.safeParse(row);
+
+    if (!validationResult.success) {
+      console.error(
+        `Erreur de validation Zod pour fetchPokemonDetail (numero ${numero}):`,
+        validationResult.error.format()
+      );
+      throw new Error(
+        `Les données du Pokémon #${numero} reçues sont invalides.`
+      );
+    }
+
     const pokemonDetail: PokemonData = {
-      id: row.id,
-      nom: row.nom,
-      numero: row.numero,
-      pv: row.pv,
-      attaque: row.attaque,
-      defense: row.defense,
-      attaque_spe: row.attaque_spe,
-      defense_spe: row.defense_spe,
-      vitesse: row.vitesse,
-      types: row.types as PokemonType[],
+      id: validationResult.data.id,
+      nom: validationResult.data.nom,
+      numero: validationResult.data.numero,
+      pv: validationResult.data.pv,
+      attaque: validationResult.data.attaque,
+      defense: validationResult.data.defense,
+      attaque_spe: validationResult.data.attaque_spe,
+      defense_spe: validationResult.data.defense_spe,
+      vitesse: validationResult.data.vitesse,
+      types: validationResult.data.types as PokemonType[],
     };
 
     return pokemonDetail;
   } catch (error) {
+    if (error instanceof Error && error.message.includes("invalides")) {
+      throw error;
+    }
     console.error(
       `Erreur lors de la récupération du Pokémon avec le numéro ${numero}:`,
       error
@@ -150,18 +184,31 @@ export async function fetchTypes(): Promise<TypeInfo[]> {
     `;
     const { rows } = await pool.query(query);
 
-    // Les noms de colonnes correspondent déjà à l'interface TypeInfo
-    const types: TypeInfo[] = rows;
+    const validationResult = TypeInfoListSchema.safeParse(rows);
 
+    if (!validationResult.success) {
+      console.error(
+        "Erreur de validation Zod pour fetchTypes:",
+        validationResult.error.format()
+      );
+      throw new Error(
+        "Les données des types reçues de la base de données sont invalides."
+      );
+    }
+
+    const types: TypeInfo[] = validationResult.data;
     return types;
   } catch (error) {
+    if (error instanceof Error && error.message.includes("invalides")) {
+      throw error;
+    }
     console.error(
       "Erreur lors de la récupération des types de Pokémon:",
       error
     );
     throw new Error("Impossible de récupérer les types de Pokémon.");
   }
-}
+};
 
 // Exemple d'utilisation (pour tester, peut être retiré plus tard)
 /* async function testFetch() {
@@ -174,7 +221,7 @@ export async function fetchTypes(): Promise<TypeInfo[]> {
       console.log("Types du premier Pokémon:", pokemonList[0.types);
       if (pokemonList.length > 24) {
         console.log("25ème Pokémon (Pikachu?):", pokemonList[24]);
-        console.log("Types de Pikachu:", pokemonList[24].types);
+        console.log("Types de Pikachu:", pokemonList[24.types);
       }
     }
   } catch (error) {
@@ -236,6 +283,6 @@ testFetchDetail();
   } finally {
     // await pool.end(); // Seulement si exécuté de manière autonome
   }
-}
+},
 // Décommentez pour tester :
-testFetchTypes(); */
+testFetchTypes(); */ 
