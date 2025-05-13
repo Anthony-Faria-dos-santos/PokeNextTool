@@ -2,19 +2,10 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-// Vous utiliserez probablement votre propre composant TypeBadge ou des styles directs ici
-// import { Badge } from '@/components/ui/badge';
-
+import { PokemonData } from "@/lib/definitions"; // Import de l'interface centrale
 // Interface pour les props du composant PokemonCard
-interface Pokemon {
-  numero: number;
-  nom: string;
-  types: { name: string; color: string }[];
-  // Ajoutez d'autres champs si nécessaire
-}
-
 interface HoloPokemonCardProps {
-  pokemon: Pokemon;
+  pokemon: PokemonData; // Utilise l'interface partagée
 }
 
 const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
@@ -116,39 +107,37 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
   return (
     <>
       <style jsx global>{`
-        /* Styles pour HoloPokemonCard. Pour une meilleure organisation, 
-           ce CSS devrait être dans un fichier .css séparé. */
-
+        /* Styles pour HoloPokemonCard */
         .holo-card-container-wrapper {
-          /* Nouveau wrapper pour la perspective et le padding */
-          padding: 0.5rem; /* Espace autour de la carte */
+          padding: 0.5rem;
           display: flex;
           justify-content: center;
           align-items: center;
         }
 
         .holo-card-perspective-container {
-          /* Gère la perspective */
           perspective: 1000px;
         }
 
+        /* --card-width et --card-height peuvent être définis ici ou dynamiquement via JS si nécessaire */
+        /* Pour l'instant, ils sont fixés dans le JS à 240px et 336px */
         .holo-card-element {
-          width: ${cardWidth}px;
-          height: ${cardHeight}px;
+          /* width: var(--card-width, 240px); */ /* Exemple si on utilisait des var CSS */
+          /* height: var(--card-height, 336px); */
           border-radius: 15px;
           transform-style: preserve-3d;
           will-change: transform;
-          transition: transform 0.05s ease-out, box-shadow 0.2s ease-out; /* Transition plus rapide pour la réactivité */
+          transition: transform 0.05s ease-out, box-shadow 0.2s ease-out;
           position: relative;
           overflow: hidden;
           box-shadow: 0px 8px 16px -4px rgba(0, 0, 0, 0.3);
           transform: rotateY(var(--ry)) rotateX(var(--rx)) scale(var(--s));
-          background-color: #2d3748; /* Fond Gris Anthracite de la charte */
+          background-color: #2d3748; /* Fond Gris Anthracite */
         }
 
         .holo-card-element.interacting {
           box-shadow: 0px 15px 30px -5px rgba(0, 0, 0, 0.5),
-            0 0 12px 2px var(--glow), 0 0 24px 4px var(--glow, #69d1e980); /* Utilisation de la variable --glow */
+            0 0 12px 2px var(--glow), 0 0 24px 4px var(--glow, #69d1e980);
         }
 
         .holo-card-content {
@@ -170,20 +159,10 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
           overflow: hidden;
           border-top-left-radius: inherit;
           border-top-right-radius: inherit;
-          background-color: #4a5568; /* Fond pour l'image si elle est transparente ou plus petite */
+          background-color: #4a5568;
         }
 
-        .holo-card-image-container img {
-          display: block;
-          width: 100%;
-          height: 100%;
-          object-fit: contain; /* 'contain' pour voir tout le Pokémon */
-          border-top-left-radius: inherit;
-          border-top-right-radius: inherit;
-          transform: translateZ(
-            20px
-          ); /* Léger effet 3D pour l'image elle-même */
-        }
+        /* Les styles pour img sont déjà bien gérés par le composant Next/Image */
 
         .holo-card-shine-overlay,
         .holo-card-glare-overlay {
@@ -197,9 +176,7 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
           z-index: 1;
           opacity: var(--o);
           transition: opacity 0.2s ease-out;
-          transform: translateZ(
-            10px
-          ); /* Positionner les effets au-dessus de l'image */
+          transform: translateZ(10px);
         }
 
         .holo-card-shine-overlay {
@@ -218,8 +195,7 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
                 calc(var(--space) * 1),
               transparent calc(var(--space) * 1.001),
               transparent calc(var(--space) * 1.999),
-              /* transparent au lieu de black */
-                hsl(calc(var(--h) * 1), var(--s-hsl), var(--l-hsl))
+              hsl(calc(var(--h) * 1), var(--s-hsl), var(--l-hsl))
                 calc(var(--space) * 2),
               hsl(calc(var(--h) * 1), var(--s-hsl), var(--l-hsl))
                 calc(var(--space) * 3),
@@ -293,15 +269,14 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
             radial-gradient(
               farthest-corner circle at var(--mx) var(--my),
               rgba(255, 255, 255, 0.8) 0%,
-              /* Blanc plus prononcé */ rgba(255, 255, 255, 0.3) 30%,
-              /* Diffusion plus large */ rgba(0, 0, 0, 0.3) 90%
-                /* Moins de noir opaque */
+              rgba(255, 255, 255, 0.3) 30%,
+              rgba(0, 0, 0, 0.3) 90%
             );
           background-blend-mode: overlay, overlay;
           background-position: center, var(--posx) var(--posy);
-          background-size: 100% 100%, 220% 220%; /* Augmenté pour un effet plus large */
+          background-size: 100% 100%, 220% 220%;
           filter: brightness(calc((var(--hyp) + 0.8) * 0.8)) contrast(1.8)
-            saturate(1.2); /* Ajusté pour plus de vivacité */
+            saturate(1.2);
           mix-blend-mode: color-dodge;
         }
 
@@ -328,25 +303,25 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
           ); /* Bleu Nuit Profond semi-transparent */
           border-bottom-left-radius: inherit;
           border-bottom-right-radius: inherit;
-          color: #f7fafc; /* Gris Perle pour le texte sur fond sombre */
+          color: #f7fafc;
           margin-top: auto;
           z-index: 2;
           position: relative;
-          transform: translateZ(5px); /* Léger décalage pour les infos */
+          transform: translateZ(5px);
         }
 
         .holo-pokemon-name {
           font-family: "Poppins", sans-serif;
           font-weight: 600;
-          font-size: 1.1rem; /* Un peu plus petit pour s'adapter */
+          font-size: 1.1rem;
           margin-bottom: 0.1rem;
-          color: #edf2f7; /* Blanc cassé */
+          color: #edf2f7;
         }
 
         .holo-pokemon-number {
           font-family: "Roboto Mono", monospace;
           font-size: 0.8rem;
-          color: #a0aec0; /* Gris plus clair pour contraste */
+          color: #a0aec0;
           margin-bottom: 0.3rem;
         }
 
@@ -356,7 +331,6 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
           gap: 0.4rem;
         }
         .holo-pokemon-types .type-badge-custom {
-          /* Assurez-vous que cette classe est unique ou préfixée */
           padding: 0.2rem 0.6rem;
           border-radius: 9999px;
           font-size: 0.7rem;
