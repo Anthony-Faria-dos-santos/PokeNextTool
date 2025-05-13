@@ -3,6 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { PokemonData } from "@/lib/definitions"; // Import de l'interface centrale
+import TypeBadge from "./TypeBadge"; // Importez le nouveau composant
+
 interface SimplePokemonCardProps {
   pokemon: PokemonData; // Utilise l'interface partagée
 }
@@ -45,16 +47,7 @@ const SimplePokemonCard: React.FC<SimplePokemonCardProps> = ({ pokemon }) => {
         </div>
         <div className="flex justify-center items-center gap-1.5">
           {pokemon.types.map((type) => (
-            <span
-              key={type.name}
-              className="px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-              style={{
-                backgroundColor: `#${type.color}`,
-                textShadow: "1px 1px 1px rgba(0,0,0,0.2)",
-              }}
-            >
-              {type.name}
-            </span>
+            <TypeBadge key={type.name} name={type.name} color={type.color} />
           ))}
         </div>
       </div>

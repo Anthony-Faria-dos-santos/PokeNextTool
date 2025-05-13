@@ -3,6 +3,8 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { PokemonData } from "@/lib/definitions"; // Import de l'interface centrale
+import TypeBadge from "./TypeBadge"; // Importez le nouveau composant
+
 // Interface pour les props du composant PokemonCard
 interface HoloPokemonCardProps {
   pokemon: PokemonData; // Utilise l'interface partagée
@@ -330,15 +332,6 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
           justify-content: center;
           gap: 0.4rem;
         }
-        .holo-pokemon-types .type-badge-custom {
-          padding: 0.2rem 0.6rem;
-          border-radius: 9999px;
-          font-size: 0.7rem;
-          font-weight: 500;
-          color: white;
-          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
       `}</style>
 
       <div className="holo-card-container-wrapper">
@@ -373,13 +366,11 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
                 </p>
                 <div className="holo-pokemon-types">
                   {pokemon.types.map((type) => (
-                    <span
+                    <TypeBadge
                       key={type.name}
-                      className="type-badge-custom"
-                      style={{ backgroundColor: `#${type.color}` }}
-                    >
-                      {type.name}
-                    </span>
+                      name={type.name}
+                      color={type.color}
+                    />
                   ))}
                 </div>
               </div>
