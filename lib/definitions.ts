@@ -15,3 +15,9 @@ export interface PokemonData {
   vitesse: number;
   types: PokemonType[];
 }
+
+export interface TypeInfo {
+  id: number;
+  name: string;
+  color: string;
+}

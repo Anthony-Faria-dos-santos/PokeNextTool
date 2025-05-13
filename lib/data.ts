@@ -1,7 +1,7 @@
 /* import dotenv from "dotenv"; */ //! A supprimer avant mise en prod.
 import { Pool } from "pg";
-import { PokemonData, PokemonType } from "./definitions";
-/* dotenv.config();  */ //! A supprimer avant mise en prod.
+import { PokemonData, PokemonType, TypeInfo } from "./definitions"; // Ajout de TypeInfo
+/* dotenv.config(); */ //! A supprimer avant mise en prod.
 
 // Configuration de la connexion à la base de données
 // Les variables d'environnement sont utilisées par défaut par le constructeur de Pool
@@ -138,8 +138,32 @@ export async function fetchPokemonDetail(
   }
 }
 
-// Exemple d'utilisation (pour tester, peut être retiré plus tard)
+export async function fetchTypes(): Promise<TypeInfo[]> {
+  try {
+    const query = `
+      SELECT
+        id,
+        name,
+        color
+      FROM type
+      ORDER BY name ASC;
+    `;
+    const { rows } = await pool.query(query);
 
+    // Les noms de colonnes correspondent déjà à l'interface TypeInfo
+    const types: TypeInfo[] = rows;
+
+    return types;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des types de Pokémon:",
+      error
+    );
+    throw new Error("Impossible de récupérer les types de Pokémon.");
+  }
+}
+
+// Exemple d'utilisation (pour tester, peut être retiré plus tard)
 /* async function testFetch() {
   try {
     console.log("Tentative de récupération des Pokémon...");
@@ -147,7 +171,7 @@ export async function fetchPokemonDetail(
     console.log(`Nombre de Pokémon récupérés: ${pokemonList.length}`);
     if (pokemonList.length > 0) {
       console.log("Premier Pokémon:", pokemonList[0]);
-      console.log("Types du premier Pokémon:", pokemonList[0].types);
+      console.log("Types du premier Pokémon:", pokemonList[0.types);
       if (pokemonList.length > 24) {
         console.log("25ème Pokémon (Pikachu?):", pokemonList[24]);
         console.log("Types de Pikachu:", pokemonList[24].types);
@@ -196,3 +220,22 @@ testFetch(); */
 // Décommentez pour tester :
 testFetchDetail();
  */
+
+// Pour tester cette nouvelle fonction :
+
+/* async function testFetchTypes() {
+  try {
+    console.log("Tentative de récupération de tous les types...");
+    const types = await fetchTypes();
+    console.log(`Nombre de types récupérés: ${types.length}`);
+    if (types.length > 0) {
+      console.log("Quelques types:", types.slice(0, 5));
+    }
+  } catch (error) {
+    console.error("Erreur lors du test de fetchTypes:", error);
+  } finally {
+    // await pool.end(); // Seulement si exécuté de manière autonome
+  }
+}
+// Décommentez pour tester :
+testFetchTypes(); */
