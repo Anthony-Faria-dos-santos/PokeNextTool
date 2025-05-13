@@ -1,7 +1,7 @@
 /* import dotenv from "dotenv"; */ //! A supprimer avant mise en prod.
 import { Pool } from "pg";
 import { PokemonData, PokemonType } from "./definitions";
-/* dotenv.config(); */ //! A supprimer avant mise en prod.
+/* dotenv.config();  */ //! A supprimer avant mise en prod.
 
 // Configuration de la connexion à la base de données
 // Les variables d'environnement sont utilisées par défaut par le constructeur de Pool
@@ -79,6 +79,65 @@ export async function fetchPokemonList(): Promise<PokemonData[]> {
   }
 }
 
+export async function fetchPokemonDetail(
+  numero: number
+): Promise<PokemonData | null> {
+  try {
+    const query = `
+      SELECT
+        p.id,
+        p.nom,
+        p.numero,
+        p.pv,
+        p.attaque,
+        p.defense,
+        p.attaque_spe,
+        p.defense_spe,
+        p.vitesse,
+        COALESCE(
+          (
+            SELECT JSON_AGG(JSON_BUILD_OBJECT('name', t.name, 'color', t.color))
+            FROM pokemon_type pt
+            JOIN type t ON pt.type_id = t.id
+            WHERE pt.pokemon_numero = p.numero
+          ),
+          '[]'::json
+        ) AS types
+      FROM pokemon p
+      WHERE p.numero = $1; -- Utilisation d'un paramètre pour le numéro
+    `;
+    const { rows } = await pool.query(query, [numero]);
+
+    if (rows.length === 0) {
+      return null; // Aucun Pokémon trouvé pour ce numéro
+    }
+
+    const row = rows[0];
+    const pokemonDetail: PokemonData = {
+      id: row.id,
+      nom: row.nom,
+      numero: row.numero,
+      pv: row.pv,
+      attaque: row.attaque,
+      defense: row.defense,
+      attaque_spe: row.attaque_spe,
+      defense_spe: row.defense_spe,
+      vitesse: row.vitesse,
+      types: row.types as PokemonType[],
+    };
+
+    return pokemonDetail;
+  } catch (error) {
+    console.error(
+      `Erreur lors de la récupération du Pokémon avec le numéro ${numero}:`,
+      error
+    );
+    throw new Error(
+      `Impossible de récupérer les détails du Pokémon #${numero}.`
+    );
+  }
+}
+
 // Exemple d'utilisation (pour tester, peut être retiré plus tard)
 
 /* async function testFetch() {
@@ -104,3 +163,36 @@ export async function fetchPokemonList(): Promise<PokemonData[]> {
 }
 
 testFetch(); */
+
+// Pour tester cette nouvelle fonction, vous pourriez ajouter quelque chose comme :
+
+/* async function testFetchDetail() {
+  try {
+    const pikachuNumero = 25;
+    console.log(`Tentative de récupération du Pokémon #${pikachuNumero}...`);
+    const pikachu = await fetchPokemonDetail(pikachuNumero);
+    if (pikachu) {
+      console.log("Détails de Pikachu:", pikachu);
+      console.log("Types de Pikachu:", pikachu.types);
+    } else {
+      console.log(`Pokémon #${pikachuNumero} non trouvé.`);
+    }
+
+    const missingNumero = 999;
+    console.log(`Tentative de récupération du Pokémon #${missingNumero}...`);
+    const missingPokemon = await fetchPokemonDetail(missingNumero);
+    if (missingPokemon) {
+      console.log("Détails du Pokémon manquant:", missingPokemon);
+    } else {
+      console.log(`Pokémon #${missingNumero} non trouvé (ce qui est attendu).`);
+    }
+  } catch (error) {
+    console.error("Erreur lors du test de fetchPokemonDetail:", error);
+  } finally {
+    // await pool.end(); // Seulement si exécuté de manière autonome
+  }
+}
+
+// Décommentez pour tester :
+testFetchDetail();
+ */
