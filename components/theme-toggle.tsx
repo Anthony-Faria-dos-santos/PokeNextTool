@@ -1,48 +1,64 @@
 "use client";
 
-import * as React from "react";
-import { Moon, Sun } from "lucide-react"; // Icônes pour le thème
-import { useTheme } from "next-themes"; // Hook pour gérer le thème
+import { useTheme } from "@/components/theme-provider"; // Correction: Utilise VOTRE hook useTheme
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 
-import { Button } from "@ui/button"; // Composant Button de shadcn/ui
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@ui/dropdown-menu"; // Composants DropdownMenu de shadcn/ui
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme(); // Ceci devrait maintenant utiliser votre propre contexte
+  const [mounted, setMounted] = useState(false);
 
-const ThemeToggle = () => {
-  const { setTheme } = useTheme(); // Récupère la fonction setTheme du hook
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
+  if (!mounted) {
+    // Rendre un placeholder ou null côté serveur pour éviter le mismatch d'hydratation
+    // Un bouton désactivé avec des dimensions fixes peut éviter les sauts de layout.
+    return (
+      <Button
+        variant="outline"
+        size="icon"
+        disabled
+        className="opacity-50 w-[36px] h-[36px]"
+      />
+    );
+  }
+  const toggleTheme = () => {
+    let currentEffectiveTheme = theme;
+    // Si le thème actuel est 'system', déterminez s'il est dark ou light
+    if (theme === "system") {
+      currentEffectiveTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+    }
+    // Basculer entre 'dark' et 'light'
+    setTheme(currentEffectiveTheme === "dark" ? "light" : "dark");
+  };
+
+  // Déterminer quel icône afficher basé sur le thème effectif
+  // Cela assure que l'icône est correcte même si le thème est 'system'
+  let displayDark = theme === "dark";
+  if (theme === "system" && mounted) {
+    // 'mounted' est important pour window.matchMedia
+    displayDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          {/* Icône Soleil pour le thème clair */}
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          {/* Icône Lune pour le thème sombre */}
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          {/* Texte pour les lecteurs d'écran */}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {/* Option Thème Clair */}
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        {/* Option Thème Sombre */}
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        {/* Option Thème Système */}
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleTheme}
+      aria-label={
+        displayDark ? "Passer au mode clair" : "Passer au mode sombre"
+      }
+    >
+      {displayDark ? (
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
+      ) : (
+        <Moon className="h-[1.2rem] w-[1.2rem]" />
+      )}
+    </Button>
   );
-};
-
-export default ThemeToggle;
+}
