@@ -5,6 +5,7 @@ import { fetchPokemonDetail } from "@/lib/data"; // Fonction de récupération d
 //import { PokemonData } from '@lib/definitions'; // Interface des données
 import TypeBadge from "@/components/TypeBadge"; // Composant pour les types
 import StatGauge from "@/components/StatGauge"; // Composant pour les statistiques
+import Link from "next/link"; // Importez le composant Link
 //import { useLowSpec } from '@contexts/LowSpecContext'; // Pour le mode basse spécification (potentiel)
 //import HoloPokemonCard from '@components/HoloPokemonCard'; // Pour l'image holo (potentiel)
 
@@ -93,13 +94,8 @@ export default async function PokemonDetailPage({
               height={300} // Ajustez la taille de l'image de détail
               layout="intrinsic" // ou "responsive" si vous voulez qu'elle s'étire
               priority // Priorité pour l'image principale
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/images/pokeball_placeholder.gif"; // Placeholder en cas d'erreur
-              }}
             />
           </div>
-
           {/* Colonne des statistiques */}
           <div className="w-full md:w-1/2">
             <h2 className="text-2xl font-poppins font-semibold mb-4 text-gray-700 dark:text-gray-200">
@@ -138,10 +134,16 @@ export default async function PokemonDetailPage({
         </div>
       </section>
 
-      {/* Optionnel: Lien de retour à la liste (Prompt 4.4) */}
-      {/* <div className="text-center mt-8">
-         <Link href="/">Retour à la liste</Link>
-      </div> */}
+      {/* Lien de retour à la liste */}
+      <div className="text-center mt-8">
+        {/* Décommenter et styliser le Link */}
+        <Link
+          href="/"
+          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-600 transition-colors text-lg font-medium"
+        >
+          ← Retour à la liste
+        </Link>
+      </div>
     </main>
   );
 }

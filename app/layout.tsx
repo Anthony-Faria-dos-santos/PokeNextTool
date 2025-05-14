@@ -8,10 +8,10 @@ import "@styles/globals.css";
 // Importez le LowSpecProvider et LowSpecToggle
 import { LowSpecProvider } from "@contexts/LowSpecContext";
 import LowSpecToggle from "@components/LowSpecToggle";
-// Importez le ThemeProvider de shadcn/ui (chemin basé sur votre structure)
+// Importez le ThemeProvider de shadcn/ui
 import { ThemeProvider } from "@components/theme-provider";
-// Importez le nouveau ThemeToggle
-import ThemeToggle from "@components/theme-toggle"; // Ajoutez cet import
+// Importez le ThemeToggle
+import ThemeToggle from "@components/theme-toggle";
 
 // Configurez les polices avec variables CSS
 const inter = Inter({
@@ -36,7 +36,14 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "PokeNextTool",
   description: "Un Pokédex moderne construit avec Next.js",
-  viewport: "width=device-width, initial-scale=1.0",
+  // Retire viewport d'ici
+  // viewport: "width=device-width, initial-scale=1.0",
+};
+
+// !! NOUVEAU: Exporter le viewport séparément
+export const viewport = {
+  width: "device-width",
+  initialScale: 1.0,
 };
 
 export default function RootLayout({
@@ -57,13 +64,9 @@ export default function RootLayout({
             </div>
           </ThemeProvider>
 
-          {/* LowSpecToggle est placé ici */}
-          {/* Ajout du ThemeToggle à côté, potentiellement dans un flexbox ou un wrapper */}
           <div className="fixed bottom-5 left-5 z-50 flex gap-2">
-            {" "}
-            {/* Exemple de wrapper pour positionnement */}
             <LowSpecToggle />
-            <ThemeToggle /> {/* Ajoutez le ThemeToggle ici */}
+            <ThemeToggle />
           </div>
         </LowSpecProvider>
       </body>

@@ -1,15 +1,16 @@
-/* import dotenv from "dotenv";
-dotenv.config(); 
- */
+import dotenv from "dotenv";
+dotenv.config();
+
 import { Pool } from "pg";
 import { PokemonData, PokemonType, TypeInfo } from "./definitions"; // Ajout de TypeInfo
 // Import des schémas Zod
 import {
   PokemonListSchema,
-  PokemonDataSchema,
+  //PokemonDataSchema,
   TypeInfoListSchema,
 } from "./schemas";
-import { configDotenv } from "dotenv";
+// Importation de dotenv pour charger les variables d'environnement
+
 // Configuration de la connexion à la base de données
 // Les variables d'environnement sont utilisées par défaut par le constructeur de Pool
 // PGUSER, PGHOST, PGDATABASE, PGPASSWORD, PGPORT
@@ -102,68 +103,58 @@ export async function fetchPokemonDetail(
   numero: number
 ): Promise<PokemonData | null> {
   try {
-    const query = `
+    // Requête 1: Récupérer les détails du Pokémon
+    const pokemonQuery = `
       SELECT
-        p.id,
-        p.nom,
-        p.numero,
-        p.pv,
-        p.attaque,
-        p.defense,
-        p.attaque_spe,
-        p.defense_spe,
-        p.vitesse,
-        COALESCE(
-          (
-            SELECT JSON_AGG(JSON_BUILD_OBJECT('name', t.name, 'color', t.color))
-            FROM pokemon_type pt
-            JOIN type t ON pt.type_id = t.id
-            WHERE pt.pokemon_numero = p.numero
-          ),
-          '['::json
-        ) AS types
-      FROM pokemon p
-      WHERE p.numero = $1; -- Utilisation d'un paramètre pour le numéro
+        id,
+        nom,
+        numero,
+        pv,
+        attaque,
+        defense,
+        attaque_spe,
+        defense_spe,
+        vitesse
+      FROM pokemon
+      WHERE numero = $1;
     `;
-    const { rows } = await pool.query(query, [numero]);
+    const { rows: pokemonRows } = await pool.query(pokemonQuery, [numero]);
 
-    if (rows.length === 0) {
-      return null; // Aucun Pokémon trouvé pour ce numéro
+    if (pokemonRows.length === 0) {
+      return null; // Aucun Pokémon trouvé
     }
 
-    const row = rows[0];
-    const validationResult = PokemonDataSchema.safeParse(row);
+    const pokemon = pokemonRows[0];
 
-    if (!validationResult.success) {
-      console.error(
-        `Erreur de validation Zod pour fetchPokemonDetail (numero ${numero}):`,
-        validationResult.error.format()
-      );
-      throw new Error(
-        `Les données du Pokémon #${numero} reçues sont invalides.`
-      );
-    }
+    // Requête 2: Récupérer les types du Pokémon
+    const typesQuery = `
+      SELECT
+        t.name,
+        t.color
+      FROM pokemon_type pt
+      JOIN type t ON pt.type_id = t.id
+      WHERE pt.pokemon_numero = $1;
+    `;
+    const { rows: typesRows } = await pool.query(typesQuery, [numero]);
 
+    // Combiner les résultats
     const pokemonDetail: PokemonData = {
-      id: validationResult.data.id,
-      nom: validationResult.data.nom,
-      numero: validationResult.data.numero,
-      pv: validationResult.data.pv,
-      attaque: validationResult.data.attaque,
-      defense: validationResult.data.defense,
-      attaque_spe: validationResult.data.attaque_spe,
-      defense_spe: validationResult.data.defense_spe,
-      vitesse: validationResult.data.vitesse,
-      types: validationResult.data.types as PokemonType[],
+      id: pokemon.id,
+      nom: pokemon.nom,
+      numero: pokemon.numero,
+      pv: pokemon.pv,
+      attaque: pokemon.attaque,
+      defense: pokemon.defense,
+      attaque_spe: pokemon.attaque_spe,
+      defense_spe: pokemon.defense_spe,
+      vitesse: pokemon.vitesse,
+      types: typesRows.map((row) => ({ name: row.name, color: row.color })),
     };
 
     return pokemonDetail;
   } catch (error) {
-    if (error instanceof Error && error.message.includes("invalides")) {
-      throw error;
-    }
     console.error(
-      `Erreur lors de la récupération du Pokémon avec le numéro ${numero}:`,
+      `Erreur lors de la récupération des détails du Pokémon #${numero}:`,
       error
     );
     throw new Error(
@@ -208,7 +199,7 @@ export async function fetchTypes(): Promise<TypeInfo[]> {
     );
     throw new Error("Impossible de récupérer les types de Pokémon.");
   }
-};
+}
 
 // Exemple d'utilisation (pour tester, peut être retiré plus tard)
 /* async function testFetch() {
@@ -263,7 +254,6 @@ testFetch(); */
     // await pool.end(); // Seulement si exécuté de manière autonome
   }
 }
-
 // Décommentez pour tester :
 testFetchDetail();
  */
@@ -285,4 +275,4 @@ testFetchDetail();
   }
 },
 // Décommentez pour tester :
-testFetchTypes(); */ 
+testFetchTypes(); */

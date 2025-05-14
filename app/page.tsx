@@ -1,7 +1,5 @@
 import React, { Suspense } from "react";
-// Retire l'import de Image qui n'est pas utilisé directement dans cette page
-// import Image from "next/image"; // Supprimer cette ligne
-
+import Link from "next/link"; // Importez le composant Link
 import { fetchPokemonList } from "@/lib/data"; // Importez la fonction de récupération des données
 import { PokemonData } from "@/lib/definitions"; // Importez l'interface PokemonData
 import PokemonCardRenderer from "@/components/PokemonCardRenderer"; // Importez le renderer de carte
@@ -41,9 +39,10 @@ async function PokemonGrid({
     // Grille responsive Tailwind CSS
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
       {pokemonList.map((pokemon) => (
-        // Utilise PokemonCardRenderer pour chaque Pokémon
-        // Enveloppez-le dans un Link plus tard pour la navigation (Prompt 4.4)
-        <PokemonCardRenderer key={pokemon.numero} pokemon={pokemon} />
+        // Enveloppez PokemonCardRenderer dans Link
+        <Link key={pokemon.numero} href={`/pokemon/${pokemon.numero}`}>
+          <PokemonCardRenderer pokemon={pokemon} />
+        </Link>
       ))}
     </div>
   );
