@@ -2,13 +2,13 @@ import React from "react";
 import { notFound } from "next/navigation"; // Pour gérer le cas où le Pokémon n'est pas trouvé
 import Image from "next/image"; // Pour l'image du Pokémon
 import { fetchPokemonDetail } from "@/lib/data"; // Fonction de récupération des détails
-//import { PokemonData } from '@lib/definitions'; // Interface des données
+//import { PokemonData } from "@/lib/definitions"; // Interface des données
 import TypeBadge from "@/components/TypeBadge"; // Composant pour les types
 import StatGauge from "@/components/StatGauge"; // Composant pour les statistiques
+// Les imports useLowSpec et HoloPokemonCard ne sont pas utilisés directement ici, on peut les retirer
+// import { useLowSpec } from '@/contexts/LowSpecContext';
+// import HoloPokemonCard from '@/components/HoloPokemonCard';
 import Link from "next/link"; // Importez le composant Link
-//import { useLowSpec } from '@contexts/LowSpecContext'; // Pour le mode basse spécification (potentiel)
-//import HoloPokemonCard from '@components/HoloPokemonCard'; // Pour l'image holo (potentiel)
-
 // Couleurs des jauges selon la charte graphique
 const statColors: { [key: string]: string } = {
   hp: "#48BB78", // Vert
@@ -30,7 +30,9 @@ interface PokemonDetailPageProps {
 export default async function PokemonDetailPage({
   params,
 }: PokemonDetailPageProps) {
-  const pokemonNumero = parseInt(params.numero, 10); // Convertir le numéro de string en nombre
+  // Accéder à params.numero ici, directement dans la fonction async
+  const numeroParam = params.numero;
+  const pokemonNumero = parseInt(numeroParam, 10); // Convertir le numéro de string en nombre
 
   // Vérifier si le numéro est valide (entre 1 et 151)
   if (isNaN(pokemonNumero) || pokemonNumero < 1 || pokemonNumero > 151) {
@@ -49,7 +51,6 @@ export default async function PokemonDetailPage({
   const primaryTypeColor = pokemon.types[0]?.color
     ? `#${pokemon.types[0].color}`
     : "#A0AEC0"; // Gris si pas de type
-
   return (
     <main className="container mx-auto p-6 md:p-10">
       {/* Section d'en-tête avec nom et numéro */}
@@ -84,18 +85,19 @@ export default async function PokemonDetailPage({
       >
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           {/* Colonne de l'image */}
-          <div className="w-full md:w-1/2 flex justify-center items-center relative">
-            {/* On pourrait utiliser HoloPokemonCard ici conditionnellement si on voulait l'effet sur la page détail */}
-            {/* Pour l'instant, une simple image optimisée */}
+          {/* Ajouter une classe de hauteur ou d'aspect ratio ici */}
+          <div className="w-full md:w-1/2 flex justify-center items-center relative aspect-square">
+            {" "}
+            {/* Ajout de aspect-square */}
+            {/* Remplacer layout="intrinsic" par fill={true} */}
             <Image
               src={`/images/pokemon/${pokemon.numero}.png`}
               alt={pokemon.nom}
-              width={300} // Ajustez la taille de l'image de détail
-              height={300} // Ajustez la taille de l'image de détail
-              layout="intrinsic" // ou "responsive" si vous voulez qu'elle s'étire
-              priority // Priorité pour l'image principale
+              fill={true}
+              priority
             />
           </div>
+
           {/* Colonne des statistiques */}
           <div className="w-full md:w-1/2">
             <h2 className="text-2xl font-poppins font-semibold mb-4 text-gray-700 dark:text-gray-200">
