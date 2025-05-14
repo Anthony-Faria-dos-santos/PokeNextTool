@@ -102,13 +102,12 @@ export default function PokemonListWithControls({
     // Obtenir la chaîne des paramètres actuels de l'URL SANS le 'search' initial
     const currentParamsString = window.location.search.substring(1);
 
-
     if (newParamsString !== currentParamsString) {
       router.push(`?${newParamsString}`, { scroll: false });
     }
-  // La dépendance searchParams est délicate car elle vient de useSearchParams()
-  // et peut causer des re-render si l'objet est recréé.
-  // On se fie aux changements de searchTerm, selectedTypes, sortOption.
+    // La dépendance searchParams est délicate car elle vient de useSearchParams()
+    // et peut causer des re-render si l'objet est recréé.
+    // On se fie aux changements de searchTerm, selectedTypes, sortOption.
   }, [searchTerm, selectedTypes, sortOption, router]);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTermState(e.target.value);
@@ -117,8 +116,8 @@ export default function PokemonListWithControls({
   const handleTypeChange = (typeName: string, checked: boolean) => {
     setSelectedTypesState((prev) => {
       const newTypes = checked
-        ? [...prev, typeName
-         ] : prev.filter((t) => t !== typeName);
+        ? [...prev, typeName]
+        : prev.filter((t) => t !== typeName);
       return newTypes.sort();
     });
   };
@@ -172,46 +171,46 @@ export default function PokemonListWithControls({
           : valB.localeCompare(valA);
       }
 
-        const statFields = [
-          "numero",
-          "pv",
-          "attaque",
-          "defense",
-          "attaque_spe",
-          "defense_spe",
-          "vitesse",
-        ];
-        if (statFields.includes(field)) {
-          valA =
-            a[
-              field as keyof Pick<
-                PokemonData,
-                | "numero"
-                | "pv"
-                | "attaque"
-                | "defense"
-                | "attaque_spe"
-                | "defense_spe"
-                | "vitesse"
-              >
-            ];
-          valB =
-            b[
-              field as keyof Pick<
-                PokemonData,
-                | "numero"
-                | "pv"
-                | "attaque"
-                | "defense"
-                | "attaque_spe"
-                | "defense_spe"
-                | "vitesse"
-              >
-            ];
-          if (typeof valA === "number" && typeof valB === "number") {
-            return order === "asc" ? valA - valB : valB - valA;
-          }
+      const statFields = [
+        "numero",
+        "pv",
+        "attaque",
+        "defense",
+        "attaque_spe",
+        "defense_spe",
+        "vitesse",
+      ];
+      if (statFields.includes(field)) {
+        valA =
+          a[
+            field as keyof Pick<
+              PokemonData,
+              | "numero"
+              | "pv"
+              | "attaque"
+              | "defense"
+              | "attaque_spe"
+              | "defense_spe"
+              | "vitesse"
+            >
+          ];
+        valB =
+          b[
+            field as keyof Pick<
+              PokemonData,
+              | "numero"
+              | "pv"
+              | "attaque"
+              | "defense"
+              | "attaque_spe"
+              | "defense_spe"
+              | "vitesse"
+            >
+          ];
+        if (typeof valA === "number" && typeof valB === "number") {
+          return order === "asc" ? valA - valB : valB - valA;
         }
+      }
       if (field !== "numero") {
         const numA = a.numero;
         const numB = b.numero;
