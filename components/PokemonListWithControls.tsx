@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation"; // Importer les hooks de navigation
+import { useSearchParams, useRouter } from "next/navigation";
 import { PokemonData, TypeInfo } from "@/lib/definitions";
 import PokemonCardRenderer from "@/components/PokemonCardRenderer";
 import { Input } from "@/components/ui/input";
@@ -16,9 +16,9 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuItem, // Import DropdownMenuItem for clear filters
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ListFilter, Search, ArrowUpDown, XCircle } from "lucide-react"; // Icônes
+import { ListFilter, Search, ArrowUpDown, XCircle } from "lucide-react";
 
 interface PokemonListWithControlsProps {
   initialPokemonList: PokemonData[];
@@ -62,7 +62,6 @@ const sortOptions: { value: SortOptionValue; label: string }[] = [
   { value: "vitesse-asc", label: "Vitesse (Croissant)" },
 ];
 
-// Définir l'option de tri par défaut
 const defaultSortOption: SortOptionValue = "numero-asc";
 
 export default function PokemonListWithControls({
@@ -72,55 +71,45 @@ export default function PokemonListWithControls({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Lire l'état initial depuis les paramètres d'URL
   const initialSearchTerm = searchParams.get("search") || "";
   const initialSelectedTypes = searchParams.get("types")?.split(",") || [];
   const initialSortOption =
     (searchParams.get("sort") as SortOptionValue) || defaultSortOption;
 
-  // Utiliser useState avec les valeurs initiales des URL
   const [searchTerm, setSearchTermState] = useState(initialSearchTerm);
   const [selectedTypes, setSelectedTypesState] = useState(initialSelectedTypes);
   const [sortOption, setSortOptionState] = useState(initialSortOption);
 
   // Synchroniser les états locaux avec l'URL
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
+    const newParams = new URLSearchParams();
 
-    // Synchroniser le terme de recherche
     if (searchTerm) {
-      params.set("search", searchTerm);
-    } else {
-      params.delete("search");
+      newParams.set("search", searchTerm);
     }
-
-    // Synchroniser les types sélectionnés
     if (selectedTypes.length > 0) {
-      // Assurez-vous que les types sélectionnés sont des noms valides si besoin
-      const validSelectedTypes = selectedTypes.filter((type) =>
-        allTypes.some((t) => t.name === type)
-      );
-      if (validSelectedTypes.length > 0) {
-        params.set("types", validSelectedTypes.join(","));
-      } else {
-        params.delete("types");
-      }
-    } else {
-      params.delete("types");
+      // Assurez-vous que selectedTypes est trié pour une URL cohérente.
+      // La validation des types par rapport à allTypes peut être faite ailleurs si nécessaire,
+      // ou si allTypes est stable, on peut le garder.
+      // Pour la stabilité de l'URL, le tri est important.
+      newParams.set("types", [...selectedTypes].sort().join(","));
     }
-
-    // Synchroniser l'option de tri (uniquement si différente du défaut)
     if (sortOption && sortOption !== defaultSortOption) {
-      params.set("sort", sortOption);
-    } else {
-      params.delete("sort");
+      newParams.set("sort", sortOption);
     }
 
-    // Mettre à jour l'URL sans rechargement complet de la page
-    router.push(`?${params.toString()}`, { scroll: false });
-  }, [searchTerm, selectedTypes, sortOption, router, searchParams, allTypes]); // allTypes ajouté car il est utilisé dans l'effet
+    const newParamsString = newParams.toString();
+    // Obtenir la chaîne des paramètres actuels de l'URL SANS le 'search' initial
+    const currentParamsString = window.location.search.substring(1);
 
-  // Mettre à jour les états locaux ET l'URL
+
+    if (newParamsString !== currentParamsString) {
+      router.push(`?${newParamsString}`, { scroll: false });
+    }
+  // La dépendance searchParams est délicate car elle vient de useSearchParams()
+  // et peut causer des re-render si l'objet est recréé.
+  // On se fie aux changements de searchTerm, selectedTypes, sortOption.
+  }, [searchTerm, selectedTypes, sortOption, router]);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTermState(e.target.value);
   };
@@ -128,9 +117,8 @@ export default function PokemonListWithControls({
   const handleTypeChange = (typeName: string, checked: boolean) => {
     setSelectedTypesState((prev) => {
       const newTypes = checked
-        ? [...prev, typeName]
-        : prev.filter((t) => t !== typeName);
-      // Optionnel: Triez les types sélectionnés pour une URL cohérente
+        ? [...prev, typeName
+         ] : prev.filter((t) => t !== typeName);
       return newTypes.sort();
     });
   };
@@ -145,44 +133,37 @@ export default function PokemonListWithControls({
     setSortOptionState(defaultSortOption);
   };
 
-  // Logique de filtrage et de tri (intégrée dans useMemo)
   const displayedPokemonList = useMemo(() => {
     let filteredList = [...initialPokemonList];
 
-    // 1. Filtrage par terme de recherche (Nom ou Numéro)
     if (searchTerm) {
       const lowerSearchTerm = searchTerm.toLowerCase();
       filteredList = filteredList.filter(
         (p) =>
           p.nom.toLowerCase().includes(lowerSearchTerm) ||
-          String(p.numero).includes(lowerSearchTerm) // Recherche par numéro (même si c'est un string)
+          String(p.numero).includes(lowerSearchTerm)
       );
     }
 
-    // 2. Filtrage par types (Doit correspondre à TOUS les types sélectionnés)
     if (selectedTypes.length > 0) {
       filteredList = filteredList.filter((pokemon) => {
-        // Pour chaque type sélectionné, vérifier si le pokémon possède ce type
         return selectedTypes.every((selectedType) =>
           pokemon.types.some((pokemonType) => pokemonType.name === selectedType)
         );
       });
     }
 
-    // 3. Tri
     const [field, order] = sortOption.split("-") as [
       keyof PokemonData | "nom",
       "asc" | "desc"
     ];
 
-    // Créer une copie pour le tri afin de ne pas modifier l'originale
     const sortedList = [...filteredList];
 
     sortedList.sort((a, b) => {
       let valA: string | number | undefined;
       let valB: string | number | undefined;
 
-      // Gérer le cas spécial du tri par nom (insensible à la casse)
       if (field === "nom") {
         valA = a.nom.toLowerCase();
         valB = b.nom.toLowerCase();
@@ -191,10 +172,6 @@ export default function PokemonListWithControls({
           : valB.localeCompare(valA);
       }
 
-      // Gérer le tri par statistiques (numérique)
-      // Assurez-vous que les champs existent sur PokemonData
-      if (field in a && field in b) {
-        // Check if the field is one of the stat keys or 'numero'
         const statFields = [
           "numero",
           "pv",
@@ -235,31 +212,23 @@ export default function PokemonListWithControls({
             return order === "asc" ? valA - valB : valB - valA;
           }
         }
-      }
-
-      // Fallback ou cas non géré (devrait normalement être géré par le tri par numéro par défaut si field isn't 'nom')
-      // As a fallback, compare by numero if it's not the primary sort
       if (field !== "numero") {
         const numA = a.numero;
         const numB = b.numero;
-        return numA - numB; // Default to numero asc if primary sort fails
+        return numA - numB;
       }
       return 0;
     });
 
     return sortedList;
-  }, [initialPokemonList, searchTerm, selectedTypes, sortOption]); // Dépendances du useMemo
+  }, [initialPokemonList, searchTerm, selectedTypes, sortOption]);
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      {/* Section des contrôles */}
       <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg shadow-md">
-        {/* Utiliser flexbox ou grille pour un meilleur contrôle responsif des contrôles */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center md:items-end">
-          {/* Barre de recherche */}
           <div className="w-full md:w-1/3 flex-shrink-0">
             {" "}
-            {/* w-full sur mobile, 1/3 sur md+ */}
             <label
               htmlFor="search"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
@@ -283,7 +252,7 @@ export default function PokemonListWithControls({
                   variant="ghost"
                   size="sm"
                   className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-                  onClick={() => setSearchTermState("")} // Utiliser l'état local pour un feedback rapide
+                  onClick={() => setSearchTermState("")}
                 >
                   <XCircle className="h-4 w-4" />
                   <span className="sr-only">Effacer la recherche</span>
@@ -292,7 +261,6 @@ export default function PokemonListWithControls({
             </div>
           </div>
 
-          {/* Sélecteur de Type(s) */}
           <div className="w-full md:w-1/3 flex-shrink-0">
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Types
@@ -304,14 +272,12 @@ export default function PokemonListWithControls({
                     {selectedTypes.length > 0
                       ? `${selectedTypes.length} type(s) sélectionné(s)`
                       : "Filtrer par type(s)"}{" "}
-                    {/* Texte adapté */}
                   </span>
                   <ListFilter className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 max-h-60 overflow-y-auto">
                 <DropdownMenuLabel>Filtrer par Type(s)</DropdownMenuLabel>{" "}
-                {/* Texte adapté */}
                 <DropdownMenuSeparator />
                 {allTypes.map((type) => (
                   <DropdownMenuCheckboxItem
@@ -334,8 +300,8 @@ export default function PokemonListWithControls({
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onSelect={() => setSelectedTypesState([])} // Utiliser l'état local
-                      className="text-red-600 dark:text-red-400 cursor-pointer" // Ajouter cursor-pointer
+                      onSelect={() => setSelectedTypesState([])}
+                      className="text-red-600 dark:text-red-400 cursor-pointer"
                     >
                       Réinitialiser les types
                     </DropdownMenuItem>
@@ -345,7 +311,6 @@ export default function PokemonListWithControls({
             </DropdownMenu>
           </div>
 
-          {/* Sélecteur de Tri */}
           <div className="w-full md:w-1/3 flex-shrink-0">
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Trier par
@@ -380,7 +345,6 @@ export default function PokemonListWithControls({
             </DropdownMenu>
           </div>
         </div>
-        {/* Bouton pour réinitialiser tous les filtres */}
         {(searchTerm ||
           selectedTypes.length > 0 ||
           sortOption !== defaultSortOption) && (
@@ -393,11 +357,9 @@ export default function PokemonListWithControls({
         )}
       </div>
 
-      {/* Grille des Pokémon */}
       {displayedPokemonList.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
           {displayedPokemonList.map((pokemon) => (
-            // Assurez-vous que Link utilise legacyBehavior={false} dans Next.js 13+ App Router
             <Link
               key={pokemon.numero}
               href={`/pokemon/${pokemon.numero}`}
@@ -412,7 +374,6 @@ export default function PokemonListWithControls({
           <p className="text-xl text-slate-600 dark:text-slate-400">
             Aucun Pokémon ne correspond à vos critères.
           </p>
-          {/* Afficher l'icône XCircle si des filtres sont actifs, sinon Search */}
           {searchTerm ||
           selectedTypes.length > 0 ||
           sortOption !== defaultSortOption ? (

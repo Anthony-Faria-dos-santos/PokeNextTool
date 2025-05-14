@@ -1,60 +1,64 @@
 import React, { Suspense } from "react";
-import Link from "next/link"; // Importez le composant Link
-import { fetchPokemonList } from "@/lib/data"; // Importez la fonction de récupération des données
-import { PokemonData } from "@/lib/definitions"; // Importez l'interface PokemonData
-import PokemonCardRenderer from "@/components/PokemonCardRenderer"; // Importez le renderer de carte
-import LoadingSkeletonCard from "@/components/LoadingSkeletonCard"; // Importez le squelette
+import { fetchPokemonList, fetchTypes } from "@/lib/data";
+import LoadingSkeletonCard from "@/components/LoadingSkeletonCard";
+import PokemonListWithControls from "@/components/PokemonListWithControls";
 
-export default async function HomePage() {
+// Définition du type pour les props de HomePage, en supposant que searchParams peut être une Promise
+type HomePageProps = {
+  params: {}; // Les pages non dynamiques (comme la racine) ont un objet params vide
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  // Si vous deviez utiliser les searchParams directement dans ce Server Component:
+  // const resolvedSearchParams = searchParams ? await searchParams : {};
+  // console.log("HomePage resolvedSearchParams:", resolvedSearchParams);
+  // Pour l'instant, HomePage ne les utilise pas directement pour sa logique principale.
   const pokemonListPromise = fetchPokemonList();
+  const typesListPromise = fetchTypes();
+
+  // console.log("HomePage rendering, passing data promises to PokemonDataResolver");
 
   return (
     <main className="flex flex-col items-center justify-center p-6 md:p-10">
-      {/* Titre principal */}
       <h1 className="text-4xl md:text-6xl font-poppins font-bold text-center mb-8 text-gray-800 dark:text-gray-100">
         Pokédex des 151
       </h1>
-
-      {/* Conteneur principal de la grille - utilise Suspense */}
-      {/* Le fallback affiche les squelettes pendant le chargement de pokemonListPromise */}
       <Suspense fallback={<PokemonGridSkeleton />}>
-        {/* Composant qui affichera la grille après la résolution de la promesse */}
-        <PokemonGrid pokemonListPromise={pokemonListPromise} />
+        <PokemonDataResolver
+          pokemonListPromise={pokemonListPromise}
+          typesListPromise={typesListPromise}
+        />
       </Suspense>
     </main>
   );
 }
 
-// Composant pour afficher la grille des Pokémon
-async function PokemonGrid({
+async function PokemonDataResolver({
   pokemonListPromise,
+  typesListPromise,
 }: {
-  // Utilise l'interface PokemonData pour typer la promesse
-  pokemonListPromise: Promise<PokemonData[]>;
+  pokemonListPromise: ReturnType<typeof fetchPokemonList>;
+  typesListPromise: ReturnType<typeof fetchTypes>;
 }) {
-  // Attend la résolution de la promesse passée depuis le Server Component parent
-  const pokemonList = await pokemonListPromise;
+  const [initialPokemonList, allTypes] = await Promise.all([
+    pokemonListPromise,
+    typesListPromise,
+  ]);
 
+  // console.log("PokemonDataResolver: Data fetched. Rendering PokemonListWithControls.");
   return (
-    // Grille responsive Tailwind CSS
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-      {pokemonList.map((pokemon) => (
-        // Enveloppez PokemonCardRenderer dans Link
-        <Link key={pokemon.numero} href={`/pokemon/${pokemon.numero}`}>
-          <PokemonCardRenderer pokemon={pokemon} />
-        </Link>
-      ))}
-    </div>
+    <PokemonListWithControls
+      initialPokemonList={initialPokemonList}
+      allTypes={allTypes}
+    />
   );
 }
 
-// Composant pour afficher les squelettes de chargement
 function PokemonGridSkeleton() {
-  // Affiche un nombre fixe de squelettes
   const numberOfSkeletons = 20;
-
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 w-full max-w-7xl mx-auto">
       {Array.from({ length: numberOfSkeletons }).map((_, index) => (
         <LoadingSkeletonCard key={index} />
       ))}
