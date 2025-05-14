@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { PokemonData } from "../lib/definitions";
+import { PokemonData } from "@lib/definitions";
 import TypeBadge from "./TypeBadge"; // Importez le nouveau composant
 
 interface HoloPokemonCardProps {

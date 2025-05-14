@@ -2,23 +2,24 @@
 
 import React from "react";
 import Image from "next/image";
-import { PokemonData } from "@/lib/definitions";
+import { PokemonData } from "@lib/definitions"; //
 import TypeBadge from "./TypeBadge"; // Importez le nouveau composant
 
 interface SimplePokemonCardProps {
-  pokemon: PokemonData;
+  pokemon: PokemonData; // Utilise l'interface partagée
 }
 
 const SimplePokemonCard: React.FC<SimplePokemonCardProps> = ({ pokemon }) => {
   const imagePath = `/images/pokemon/${pokemon.numero}.png`;
   const placeholderImage = "/images/pokeball_placeholder.gif";
 
-  const cardWidth = 240; // Dimensions de base cohérentes avec HoloPokemonCard
-  const cardHeight = 336; // Dimensions de base cohérentes avec HoloPokemonCard
+  const cardWidth = 240;
+  const cardHeight = 336;
+
   return (
     <div
       className="bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex flex-col overflow-hidden group"
-      style={{ width: `${cardWidth}px`, height: `${cardHeight}px` }} // Dimensions fixes appliquées
+      style={{ width: `${cardWidth}px`, height: `${cardHeight}px` }}
     >
       <div className="w-full h-[70%] relative bg-slate-200 dark:bg-slate-700/50 overflow-hidden">
         <Image

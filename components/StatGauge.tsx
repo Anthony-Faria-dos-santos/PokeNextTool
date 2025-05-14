@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Progress } from "../components/ui/progress"; // Assurez-vous que ce composant est installé
+import { Progress } from "@ui/progress"; // Assurez-vous que ce composant est installé
 
 interface StatGaugeProps {
   label: string;

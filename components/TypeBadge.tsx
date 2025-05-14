@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface TypeBadgeProps {
   name: string;
@@ -12,7 +12,10 @@ const TypeBadge: React.FC<TypeBadgeProps> = ({ name, color }) => {
   return (
     <span
       className="px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-      style={{ backgroundColor: bgColor, textShadow: '1px 1px 1px rgba(0,0,0,0.2)' }}
+      style={{
+        backgroundColor: bgColor,
+        textShadow: "1px 1px 1px rgba(0,0,0,0.2)",
+      }}
     >
       {name}
     </span>

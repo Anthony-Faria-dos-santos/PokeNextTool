@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useLowSpec } from "../contexts/LowSpecContext"; // Import correct du contexte
-import { PokemonData } from "../lib/definitions"; // Import de l'interface centrale
+import { useLowSpec } from "@contexts/LowSpecContext"; // Import correct du contexte
+import { PokemonData } from "@lib/definitions"; // Import de l'interface centrale
 import HoloPokemonCard from "./HoloPokemonCard"; // Import relatif
 import SimplePokemonCard from "./SimplePokemonCard"; // Import relatif (nom corrigé)
 
