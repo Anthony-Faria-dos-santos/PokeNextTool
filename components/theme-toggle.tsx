@@ -4,13 +4,13 @@ import * as React from "react";
 import { Moon, Sun } from "lucide-react"; // Icônes pour le thème
 import { useTheme } from "next-themes"; // Hook pour gérer le thème
 
-import { Button } from "@/components/ui/button"; // Composant Button de shadcn/ui
+import { Button } from "@ui/button"; // Composant Button de shadcn/ui
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"; // Composants DropdownMenu de shadcn/ui
+} from "@ui/dropdown-menu"; // Composants DropdownMenu de shadcn/ui
 
 const ThemeToggle = () => {
   const { setTheme } = useTheme(); // Récupère la fonction setTheme du hook
