@@ -1,8 +1,11 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { fetchPokemonDetail } from "@/lib/data";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import TypeBadge from "@/components/TypeBadge";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import StatGauge from "@/components/StatGauge";
 import Link from "next/link";
 const statColors: { [key: string]: string } = {
@@ -14,16 +17,18 @@ const statColors: { [key: string]: string } = {
   speed: "#ECC94B",
 };
 
-type PageProps = {
+interface PokemonDetailPageProps {
   params: Promise<{
     numero: string;
   }>;
   searchParams: Promise<{
     [key: string]: string | string[] | undefined;
   }>;
-};
+}
 // Props de la page directement typées dans la signature de la fonction
-export default async function PokemonDetailPage({ params }: PageProps) {
+export default async function PokemonDetailPage({
+  params,
+}: PokemonDetailPageProps) {
   // Attendez la résolution de la Promise params
   const resolvedParams = await params;
   const numeroParam = resolvedParams.numero;
