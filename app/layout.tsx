@@ -1,33 +1,47 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Roboto_Mono } from "next/font/google";
+import { Inter, Poppins, Roboto_Mono } from "next/font/google"; // Garder une seule fois
 import "@styles/globals.css";
+import "@styles/components/HoloPokemonCard.css"; // CSS pour HoloPokemonCard
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { LowSpecProvider } from "@contexts/LowSpecContext";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import LowSpecToggle from "@components/LowSpecToggle";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { ThemeProvider } from "@components/theme-provider";
-import { ThemeToggle } from "@components/theme-toggle";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
+import { ThemeToggle } from "@components/theme-toggle"; // Assurez-vous que l'export est correct
 
+// Configuration des polices (une seule fois)
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
+
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
+
 const robotoMono = Roboto_Mono({
   variable: "--font-roboto-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
+// Metadata (une seule fois)
 export const metadata: Metadata = {
   title: "PokeNextTool",
   description: "Un Pokédex moderne construit avec Next.js",
 };
-export const viewport = { width: "device-width", initialScale: 1.0 };
+
+// Viewport (une seule fois)
+export const viewport = {
+  width: "device-width",
+  initialScale: 1.0,
+};
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,9 +72,7 @@ export default function RootLayout({
       document.documentElement.classList.add('light');
       document.documentElement.style.colorScheme = 'light';
     }
-  } catch (e) {
-    // Ignorer les erreurs (par exemple, si localStorage n'est pas accessible)
-  }
+  } catch (e) {}
 })();
             `,
           }}

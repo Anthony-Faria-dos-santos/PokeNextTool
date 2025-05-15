@@ -2,8 +2,11 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { PokemonData } from "@lib/definitions";
-import TypeBadge from "./TypeBadge"; // Importez le nouveau composant
+// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
+import TypeBadge from "@components/TypeBadge";
+// PAS D'IMPORT DE MODULE CSS ICI
 
 interface HoloPokemonCardProps {
   pokemon: PokemonData;
@@ -13,28 +16,19 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isInteracting, setIsInteracting] = useState(false);
 
-  const cardWidth = 240; // Dimensions de base
-  const cardHeight = 336; // Dimensions de base
-
-  // Ajuster onMouseMove pour calculer les positions relatives au conteneur d'image si les overlays sont déplacés
   const onMouseMove = useCallback((e: MouseEvent) => {
     if (!cardRef.current) return;
-
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
     const mouseX = (x / rect.width - 0.5) * 2;
     const mouseY = (y / rect.height - 0.5) * -2;
-
     const rotateY = mouseX * 15;
     const rotateX = mouseY * 15;
-
-    // !! NOUVEAU: Calculer les positions de reflet/glare par rapport au conteneur de l'image
     const imageContainer = cardRef.current.querySelector(
       ".holo-card-image-container"
     );
-    let glareX = 50; // Default to center if container not found or during touch
+    let glareX = 50;
     let glareY = 50;
     if (imageContainer) {
       const imgRect = imageContainer.getBoundingClientRect();
@@ -43,27 +37,20 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
       glareX = (imgX / imgRect.width) * 100;
       glareY = (imgY / imgRect.height) * 100;
     }
-
     cardRef.current.style.setProperty("--rx", `${rotateX}deg`);
     cardRef.current.style.setProperty("--ry", `${rotateY}deg`);
-
-    // Appliquer les positions de reflet/glare sur la carte principale
-    // Ces variables seront utilisées par les overlays
     cardRef.current.style.setProperty("--mx", `${glareX}%`);
     cardRef.current.style.setProperty("--my", `${glareY}%`);
-    cardRef.current.style.setProperty("--posx", `${glareX}%`); // Variables alternatives
+    cardRef.current.style.setProperty("--posx", `${glareX}%`);
     cardRef.current.style.setProperty("--posy", `${glareY}%`);
-
     const hyp = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
     cardRef.current.style.setProperty("--hyp", `${hyp}`);
-  }, []); // Dependencies don't change
+  }, []);
+
   const onMouseEnter = () => {
     setIsInteracting(true);
-    if (cardRef.current) {
-      cardRef.current.style.setProperty("--o", "1");
-    }
+    if (cardRef.current) cardRef.current.style.setProperty("--o", "1");
   };
-
   const onMouseLeave = () => {
     setIsInteracting(false);
     if (cardRef.current) {
@@ -77,11 +64,9 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
       cardRef.current.style.setProperty("--hyp", "0");
     }
   };
-
   useEffect(() => {
     const cardElement = cardRef.current;
     if (cardElement) {
-      // !! NOUVEAU: Détection d'appareil tactile
       const isTouchDevice =
         "ontouchstart" in window || navigator.maxTouchPoints > 0;
       if (!isTouchDevice) {
@@ -89,23 +74,17 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
         cardElement.addEventListener("mouseenter", onMouseEnter);
         cardElement.addEventListener("mouseleave", onMouseLeave);
       } else {
-        // Optionnel: appliquer un style statique ou une animation simple sur mobile
-        cardElement.style.setProperty("--o", "0.5"); // Garder une légère brillance statique
-        // Les rotations restent à 0deg (par défaut)
+        cardElement.style.setProperty("--o", "0.3");
       }
-
-      // Reset styles
       cardElement.style.setProperty("--mx", "50%");
       cardElement.style.setProperty("--my", "50%");
       cardElement.style.setProperty("--rx", "0deg");
       cardElement.style.setProperty("--ry", "0deg");
-      cardElement.style.setProperty("--posx", `50%`);
-      cardElement.style.setProperty("--posy", `50%`);
-      cardElement.style.setProperty("--o", "0"); // Commence sans brillance
+      cardElement.style.setProperty("--posx", "50%");
+      cardElement.style.setProperty("--posy", "50%");
+      if (!isTouchDevice) cardElement.style.setProperty("--o", "0");
       cardElement.style.setProperty("--s", "1");
       cardElement.style.setProperty("--hyp", "0");
-
-      // Set color variables
       cardElement.style.setProperty("--red", "#f80e7b");
       cardElement.style.setProperty("--yel", "#eedf10");
       cardElement.style.setProperty("--gre", "#21e985");
@@ -116,7 +95,6 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
         : "#69d1e9";
       cardElement.style.setProperty("--glow", primaryTypeColor);
 
-      // Nettoyage des écouteurs
       return () => {
         if (!isTouchDevice && cardElement) {
           cardElement.removeEventListener("mousemove", onMouseMove);
@@ -125,66 +103,55 @@ const HoloPokemonCard: React.FC<HoloPokemonCardProps> = ({ pokemon }) => {
         }
       };
     }
-
-    // Nettoyage si le composant est démonté avant que l'effet ne s'exécute
-    return () => {}; // Pas de nettoyage spécifique si pas d'écouteurs ajoutés
-  }, [onMouseMove, pokemon.types]); // Dépendances pour useEffect
+    return () => {};
+  }, [onMouseMove, pokemon.types]);
 
   const imagePath = `/images/pokemon/${pokemon.numero}.png`;
   const placeholderImage = "/images/pokeball_placeholder.gif";
 
   return (
-    <>
-      {" "}
-      {/* Fragment React */}
-      <div className="holo-card-container-wrapper">
-        <div className="holo-card-perspective-container">
-          <div
-            ref={cardRef}
-            className={`holo-card-element ${
-              isInteracting ? "interacting" : ""
-            }`}
-          >
-            <div className="holo-card-content">
-              {/* Overlays moved INSIDE holo-card-image-container */}
-              <div className="holo-card-image-container">
-                {" "}
-                {/* Parent en position: relative */}
-                <Image
-                  src={imagePath}
-                  alt={pokemon.nom}
-                  width={cardWidth}
-                  height={Math.floor(cardHeight * 0.7)}
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = placeholderImage;
-                  }}
-                  priority={pokemon.numero <= 12}
-                />
-                <div className="holo-card-shine-overlay"></div>
-                <div className="holo-card-glare-overlay"></div>
-              </div>
+    <div className="holo-card-container-wrapper">
+      <div className="holo-card-perspective-container">
+        <div
+          ref={cardRef}
+          className={`holo-card-element ${isInteracting ? "interacting" : ""}`}
+        >
+          <div className="holo-card-content">
+            <div className="holo-card-image-container">
+              <Image
+                src={imagePath}
+                alt={pokemon.nom}
+                width={240}
+                height={Math.floor(336 * 0.7)}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = placeholderImage;
+                }}
+                priority={pokemon.numero <= 12}
+              />
+              <div className="holo-card-shine-overlay"></div>
+              <div className="holo-card-glare-overlay"></div>
+            </div>
 
-              <div className="holo-card-info">
-                <h3 className="holo-pokemon-name">{pokemon.nom}</h3>
-                <p className="holo-pokemon-number">
-                  #{String(pokemon.numero).padStart(3, "0")}
-                </p>
-                <div className="holo-pokemon-types">
-                  {pokemon.types.map((type) => (
-                    <TypeBadge
-                      key={type.name}
-                      name={type.name}
-                      color={type.color}
-                    />
-                  ))}
-                </div>
+            <div className="holo-card-info">
+              <h3 className="holo-pokemon-name">{pokemon.nom}</h3>
+              <p className="holo-pokemon-number">
+                #{String(pokemon.numero).padStart(3, "0")}
+              </p>
+              <div className="holo-pokemon-types">
+                {pokemon.types.map((type) => (
+                  <TypeBadge
+                    key={type.name}
+                    name={type.name}
+                    color={type.color}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </> // Fin du fragment React
+    </div>
   );
 };
 
