@@ -1,21 +1,12 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { fetchPokemonDetail } from "@/lib/data";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import TypeBadge from "@/components/TypeBadge";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import StatGauge from "@/components/StatGauge";
 import Link from "next/link";
-const statColors: { [key: string]: string } = {
-  hp: "#48BB78",
-  attack: "#F56565",
-  defense: "#4299E1",
-  special_attack: "#9F7AEA",
-  special_defense: "#38B2AC",
-  speed: "#ECC94B",
-};
+
+// La variable statColors a été supprimée car elle n'était plus utilisée.
 
 interface PokemonDetailPageProps {
   params: Promise<{
@@ -90,32 +81,12 @@ export default async function PokemonDetailPage({
               Statistiques
             </h2>
             <div className="space-y-3">
-              <StatGauge label="PV" value={pokemon.pv} color={statColors.hp} />
-              <StatGauge
-                label="Attaque"
-                value={pokemon.attaque}
-                color={statColors.attack}
-              />
-              <StatGauge
-                label="Défense"
-                value={pokemon.defense}
-                color={statColors.defense}
-              />
-              <StatGauge
-                label="Attaque Spé."
-                value={pokemon.attaque_spe}
-                color={statColors.special_attack}
-              />
-              <StatGauge
-                label="Défense Spé."
-                value={pokemon.defense_spe}
-                color={statColors.special_defense}
-              />
-              <StatGauge
-                label="Vitesse"
-                value={pokemon.vitesse}
-                color={statColors.speed}
-              />
+              <StatGauge label="PV" value={pokemon.pv} />
+              <StatGauge label="Attaque" value={pokemon.attaque} />
+              <StatGauge label="Défense" value={pokemon.defense} />
+              <StatGauge label="Attaque Spé." value={pokemon.attaque_spe} />
+              <StatGauge label="Défense Spé." value={pokemon.defense_spe} />
+              <StatGauge label="Vitesse" value={pokemon.vitesse} />
             </div>
           </div>
         </div>
