@@ -2,13 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Poppins, Roboto_Mono } from "next/font/google"; // Garder une seule fois
 import "@styles/globals.css";
 import "@styles/components/HoloPokemonCard.css"; // CSS pour HoloPokemonCard
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { LowSpecProvider } from "@contexts/LowSpecContext";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import LowSpecToggle from "@components/LowSpecToggle";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { ThemeProvider } from "@components/theme-provider";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { ThemeToggle } from "@components/theme-toggle"; // Assurez-vous que l'export est correct
 
 // Configuration des polices (une seule fois)
