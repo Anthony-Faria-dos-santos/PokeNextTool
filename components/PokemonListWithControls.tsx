@@ -109,7 +109,7 @@ export default function PokemonListWithControls({
     }
     // Dépendances : router n'est pas nécessaire car stable.
     // searchParams est retiré pour éviter des re-renders si son instance change.
-  }, [searchTerm, selectedTypes, sortOption]);
+  }, [router, searchTerm, selectedTypes, sortOption]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTermState(e.target.value);
