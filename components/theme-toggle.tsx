@@ -1,9 +1,7 @@
 "use client";
 
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { useTheme } from "@components/theme-provider"; // Correction: Utilise VOTRE hook useTheme
 import { useState, useEffect } from "react";
-// @ts-expect-error Inhibition des erreurs 'non bloquantes' TypeScript comportant des @liases
 import { Button } from "@components/ui/button";
 import { Moon, Sun } from "lucide-react";
 
