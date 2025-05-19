@@ -22,7 +22,7 @@ interface RawPokedexData {
 
 async function fetchPokedexDataFromDb(): Promise<PokedexData | null> {
   try {
-    console.log("Fetching data from database...");
+    console.log("Fetching depuis la database...");
     const pokemonData =
       await sql<Pokemon>`SELECT * FROM pokemon ORDER BY numero;`;
     const typeData =
@@ -32,7 +32,9 @@ async function fetchPokedexDataFromDb(): Promise<PokedexData | null> {
 
     // Simule une erreur si aucune donnée n'est retournée pour tester le fallback
     if (pokemonData.rows.length === 0) {
-      console.warn("No data returned from DB, attempting fallback to JSON.");
+      console.warn(
+        "Aucune donnée retournée par la DB, tentative de fallback vers le JSON."
+      );
       return null;
     }
 
@@ -42,7 +44,10 @@ async function fetchPokedexDataFromDb(): Promise<PokedexData | null> {
       pokemon_type: pokemonTypeData.rows,
     };
   } catch (error) {
-    console.error("Database fetch failed:", error);
+    console.error(
+      "Échec de la récupération des données de la base de données :",
+      error
+    );
     return null; // Retourne null pour indiquer qu'il faut utiliser le fallback
   }
 }
@@ -66,7 +71,7 @@ async function fetchPokedexDataFromJson(): Promise<PokedexData | null> {
       pokemon_type: rawData.pokemon_type,
     };
   } catch (error) {
-    console.error("JSON data fetch failed:", error);
+    console.error("Échec de la récupération des données JSON :", error);
     // En cas d'échec de lecture du JSON, nous n'avons plus de fallback.
     // Il faut décider quoi faire : lancer l'erreur ou retourner null/un objet vide.
     // Pour Stackblitz, si le JSON est la seule source, une erreur ici est critique.
@@ -80,7 +85,7 @@ export async function getPokedexData(): Promise<PokedexData> {
   let data = await fetchPokedexDataFromDb();
   if (!data) {
     console.log(
-      "Failed to fetch from DB or DB is empty, falling back to JSON."
+      "Échec de la récupération des données de la DB ou la DB est vide, tentative de fallback vers le JSON."
     );
     data = await fetchPokedexDataFromJson();
   }
@@ -91,7 +96,7 @@ export async function getPokedexData(): Promise<PokedexData> {
     // C'est un cas critique. Soit le JSON est manquant/corrompu.
     // Il est préférable de lancer une erreur claire ici pour le débogage.
     throw new Error(
-      "Failed to fetch data from both database and JSON fallback. JSON file might be missing or corrupted."
+      "Échec de la récupération des données de la DB et du fallback JSON. Le fichier JSON est peut-être manquant ou corrompu."
     );
   }
   return data;
@@ -116,7 +121,7 @@ export async function getPokemonTypes(): Promise<PokemonType[]> {
   return data.pokemon_type;
 }
 
-// Exemple d'une fonction qui récupère un Pokémon spécifique par son numéro
+// fonction qui récupère un Pokémon spécifique par son numéro
 export async function getPokemonByNumero(
   numero: number
 ): Promise<Pokemon | undefined> {
@@ -124,7 +129,7 @@ export async function getPokemonByNumero(
   return allPokemon.find((p) => p.numero === numero);
 }
 
-// Exemple d'une fonction qui récupère les types d'un Pokémon
+// fonction qui récupère les types d'un Pokémon
 export async function getTypesForPokemon(
   pokemonNumero: number
 ): Promise<Type[]> {
