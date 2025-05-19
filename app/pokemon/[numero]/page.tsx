@@ -6,7 +6,7 @@ import TypeBadge from "@/components/TypeBadge";
 import StatGauge from "@/components/StatGauge";
 import Link from "next/link";
 
-// La variable statColors a été supprimée car elle n'était plus utilisée.
+// Note: La variable statColors a été retirée car elle n'est plus utilisée ici.
 
 interface PokemonDetailPageProps {
   params: Promise<{
@@ -16,11 +16,11 @@ interface PokemonDetailPageProps {
     [key: string]: string | string[] | undefined;
   }>;
 }
-// Props de la page directement typées dans la signature de la fonction
+// Typage des props pour la page, directement dans la signature.
 export default async function PokemonDetailPage({
   params,
 }: PokemonDetailPageProps) {
-  // Attendez la résolution de la Promise params
+  // On récupère les paramètres de la page après résolution de la Promise.
   const resolvedParams = await params;
   const numeroParam = resolvedParams.numero;
   const pokemonNumero = parseInt(numeroParam, 10);
@@ -36,10 +36,10 @@ export default async function PokemonDetailPage({
   }
   const primaryTypeColor = pokemon.types[0]?.color
     ? `#${pokemon.types[0].color}`
-    : "#A0AEC0";
+    : "#A0AEC0"; // Couleur par défaut si pas de type.
   return (
     <main className="container mx-auto p-6 md:p-10">
-      {/* Section d'en-tête avec nom et numéro */}
+      {/* Section en-tête : affiche le nom et le numéro du Pokémon. */}
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-5xl font-poppins font-bold text-gray-800 dark:text-gray-100 mb-2">
           {pokemon.nom}
@@ -54,15 +54,15 @@ export default async function PokemonDetailPage({
         </div>
       </div>
 
-      {/* Section principale avec image et statistiques */}
+      {/* Section principale : contient l'image et les statistiques du Pokémon. */}
       <section
         className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 md:p-8 shadow-lg"
         style={{
           backgroundColor: primaryTypeColor
-            ? `${primaryTypeColor}20`
+            ? `${primaryTypeColor}20` // Applique une couleur de fond basée sur le type primaire.
             : undefined,
           backgroundImage: primaryTypeColor
-            ? `radial-gradient(circle at 50% 50%, ${primaryTypeColor}30, transparent 60%)`
+            ? `radial-gradient(circle at 50% 50%, ${primaryTypeColor}30, transparent 60%)` // Effet radial subtil.
             : undefined,
           transition: "background-color 0.5s ease, background-image 0.5s ease",
         }}

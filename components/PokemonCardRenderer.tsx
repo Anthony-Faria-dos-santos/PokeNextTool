@@ -1,39 +1,33 @@
 "use client";
 
 import React from "react";
-import { useLowSpec } from "@contexts/LowSpecContext"; // Import correct du contexte
-import { PokemonData } from "@lib/definitions"; // Import de l'interface centrale
-import HoloPokemonCard from "./HoloPokemonCard"; // Import relatif
-import SimplePokemonCard from "./SimplePokemonCard"; // Import relatif (nom corrigé)
+import { useLowSpec } from "@contexts/LowSpecContext"; // Hook pour le mode d'affichage.
+import { PokemonData } from "@lib/definitions"; // Interface des données Pokémon.
+import HoloPokemonCard from "./HoloPokemonCard"; // Carte avec effets.
+import SimplePokemonCard from "./SimplePokemonCard"; // Carte simplifiée.
 
-// Retirer l'interface PokemonRenderer
+// L'interface PokemonRenderer n'est plus nécessaire car on utilise PokemonData directement.
 /*
-interface PokemonRenderer {
-  numero: number;
-  nom: string;
-  types: { name: string; color: string }[];
-  pv?: number;
-  attaque?: number;
-  defense?: number;
-  attaque_spe?: number;
-  defense_spe?: number;
-  vitesse?: number;
-}
+interface PokemonRenderer { ... }
 */
 
 interface PokemonCardRendererProps {
-  pokemon: PokemonData; // Utilise PokemonData ici
+  pokemon: PokemonData; // Les données complètes du Pokémon à afficher.
 }
 
+// Ce composant choisit quelle version de la carte Pokémon afficher
+// en fonction de l'état du mode "LowSpec".
 const PokemonCardRenderer: React.FC<PokemonCardRendererProps> = ({
   pokemon,
 }) => {
-  const { isLowSpec } = useLowSpec();
+  const { isLowSpec } = useLowSpec(); // Récupère l'état actuel du mode LowSpec.
 
+  // Si le mode LowSpec est activé, on affiche la carte simple.
   if (isLowSpec) {
     return <SimplePokemonCard pokemon={pokemon} />;
   }
 
+  // Sinon, on affiche la carte avec les effets holographiques.
   return <HoloPokemonCard pokemon={pokemon} />;
 };
 
