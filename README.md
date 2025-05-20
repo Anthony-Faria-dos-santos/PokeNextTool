@@ -140,7 +140,7 @@ PokeNextTool est un projet en constante évolution. Voici quelques pistes d'amé
 
 5.  **Configuration de l'environnement :**
 
-    - À la racine de votre projet, créez un fichier `.env.local` (s'il n'existe pas déjà, vous pouvez copier le `.env.example` fourni, le renommer en `.env` et le compléter).
+    - À la racine de votre projet, créez un fichier `.env.local` (s'il n'existe pas déjà, vous pouvez copier le `.env.example` fourni, le renommer et le compléter).
     - Ajoutez et configurez les variables d'environnement pour la connexion à votre base de données PostgreSQL. Par exemple :
       ```plaintext
       PGHOST=localhost
