@@ -12,7 +12,7 @@ Initialement un projet d'école utilisant une stack EJS/Node.js, cette version a
 
 - **Framework Frontend/Backend :** Next.js 15 (App Router)
 - **Langage :** TypeScript
-- **Styling :** Tailwind CSS & CSS Modules (avec une touche d'effets holographiques)
+- **Styling :** Tailwind CSS & CSS Modules (avec une touche d'effets holographiques) Dédicace au travail exceptionnel de [Simon Goellner](https://poke-holo.simey.me/)
 - **Composants UI :** shadcn/ui
 - **Gestion des données :**
   - PostgreSQL (source primaire)
@@ -20,7 +20,6 @@ Initialement un projet d'école utilisant une stack EJS/Node.js, cette version a
 - **Validation de données :** Zod
 - **Gestionnaire de paquets :** pnpm (avec workspaces)
 - **Linting/Formatting :** ESLint (implicite avec les configurations Next.js modernes)
-- **Déploiement (cible) :** Vercel
 
 ## Étapes clés du développement
 
@@ -95,16 +94,17 @@ PokeNextTool est un projet en constante évolution. Voici quelques pistes d'amé
 
 1.  **Prérequis :**
 
-    - Node.js (version LTS ou version recommandée par Next.js 15)
+    Node.js v18.17 minimum --> Next.js 15
     - pnpm (`npm install -g pnpm`)
-    - PostgreSQL (serveur installé et en cours d'exécution)
+    - Dans l'idéal PostgreSQL (serveur installé et en cours d'exécution)
+    - Au pire sans postgres vous aurez une expérience fonctionnelle mais dégradée (fallback json) au fur et à mesure de l'avancement du projet.
 
 2.  **Cloner le dépôt :**
 
     ```bash
-    git clone [URL_DU_DEPOT_GIT_ICI
-    cd pokenexttool
-    # Remplacez pokenexttool par le nom réel de votre dossier si différent
+    git clone [URL_DU_DEPOT_GIT]
+    cd [Votre_Dossier_favori]
+    # Le clonage du dépôt créera automatiquement un dossier pokenexttool.
     ```
 
 3.  **Installer les dépendances du projet :**
@@ -130,7 +130,7 @@ PokeNextTool est un projet en constante évolution. Voici quelques pistes d'amé
 
       Quittez `psql` pour le moment (`\q`).
 
-    - **Importer les données (Seeding) :** Assurez-vous que le fichier `pokedex.sql` (contenant la structure des tables et les données initiales) se trouve à la racine de votre projet cloné. Exécutez la commande suivante depuis la racine de votre projet dans votre terminal (pas dans `psql`) pour peupler la base de données que vous venez de créer. Remplacez `pokedex_db` par le nom de votre base de données si différent, et `postgres` par votre nom d'utilisateur PostgreSQL si nécessaire.
+    - **Importer les données (Seeding) :** Assurez-vous que le fichier `pokedex.sql` (contenant la structure des tables et les données initiales) se trouve bien à la racine du projet cloné. Exécutez la commande suivante depuis la racine de votre projet dans votre terminal (pas dans `psql`) pour peupler la base de données que vous venez de créer. Remplacez `pokedex_db` par le nom de votre base de données si différent, et `postgres` par votre nom d'utilisateur PostgreSQL.
       ```bash
       psql -U postgres -d pokedex_db -f pokedex.sql
       # S'il demande un mot de passe, saisissez-le.
@@ -140,7 +140,7 @@ PokeNextTool est un projet en constante évolution. Voici quelques pistes d'amé
 
 5.  **Configuration de l'environnement :**
 
-    - À la racine de votre projet, créez un fichier `.env.local` (s'il n'existe pas déjà, vous pouvez copier un éventuel `.env.example` s'il est fourni).
+    - À la racine de votre projet, créez un fichier `.env.local` (s'il n'existe pas déjà, vous pouvez copier le `.env.example` fourni, le renommer en `.env` et le compléter).
     - Ajoutez et configurez les variables d'environnement pour la connexion à votre base de données PostgreSQL. Par exemple :
       ```plaintext
       PGHOST=localhost
@@ -159,4 +159,4 @@ PokeNextTool est un projet en constante évolution. Voici quelques pistes d'amé
 
 ---
 
-Merci d'avoir exploré PokeNextTool !
+Merci d'avoir exploré PokeNextTool et n'hésitez pas à repasser de temps en temps pour suivre son évolution !
