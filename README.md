@@ -2,7 +2,7 @@
 
 Bienvenue sur PokeNextTool, une application web moderne de type Pokédex construite avec Next.js 15, TypeScript, et Tailwind CSS. Ce projet est une refonte et une amélioration d'un projet scolaire initialement développé avec EJS et Node.js.
 
-**Lien StackBlitz pour démonstration :** [STACKBLITZ](https://stackblitz.com/github/Anthony-Faria-dos-santos/PokeNextTool)]
+**Lien StackBlitz pour démonstration :** [STACKBLITZ](https://stackblitz.com/github/Anthony-Faria-dos-santos/PokeNextTool)
 
 ## À propos du projet
 
