@@ -2,6 +2,8 @@
 
 Bienvenue sur PokeNextTool, une application web moderne de type Pokédex construite avec Next.js 15, TypeScript, et Tailwind CSS. Ce projet est une refonte et une amélioration d'un projet scolaire initialement développé avec EJS et Node.js.
 
+"Projet personnel à but pédagogique non commerciale"
+
 **Lien StackBlitz pour démonstration :** [STACKBLITZ](https://stackblitz.com/github/Anthony-Faria-dos-santos/PokeNextTool)
 
 ## À propos du projet
@@ -19,18 +21,18 @@ Initialement un projet d'école utilisant une stack EJS/Node.js, cette version a
   - Fallback sur fichier JSON (`pokedex_export.json`) pour portabilité (notamment pour StackBlitz)
 - **Validation de données :** Zod
 - **Gestionnaire de paquets :** pnpm (avec workspaces)
-- **Linting/Formatting :** ESLint (implicite avec les configurations Next.js modernes)
+- **Linting/Formatting :** ESLint
 
 ## Étapes clés du développement
 
-Le développement de PokeNextTool a suivi plusieurs phases itératives, reflétées par l'historique des commits :
+Le développement de PokeNextTool a suivi plusieurs phases itératives, reflétées et documenté par l'historique des commits (Conventional commits) :
 
-1.  **Initialisation et Configuration (Commits `28efd4d`, `687ee31`)**
+1.  **Initialisation et Configuration du projet (Commits `28efd4d`, `687ee31`)**
 
     - Mise en place du projet Next.js.
     - Configuration initiale de TypeScript et des outils de base.
 
-2.  **Accès aux Données et Premières Fonctionnalités (Commits `45324f9` à `2d6cb60`)**
+2.  **Accès aux Données et Premières Features (Commits `45324f9` à `2d6cb60`)**
 
     - Passage de `npm` à `pnpm` pour une meilleure gestion des dépendances.
     - Implémentation des fonctions de base pour récupérer les données Pokémon depuis une base de données PostgreSQL (`fetchPokemonList`, `fetchPokemonDetail`, `fetchTypes`).
@@ -38,9 +40,9 @@ Le développement de PokeNextTool a suivi plusieurs phases itératives, reflét�
 
 3.  **Développement des Composants UI React (Commits `5f57262` à `01b00ea`, `b23945d`, `cd1a12a`, `a984ed9`, `b1783f6`)**
 
-    - Création de composants réutilisables pour afficher les informations des Pokémon : `HoloPokemonCard`, `SimplePokemonCard`, `TypeBadge`, `StatGauge`.
+    - Création de composants réutilisables (dynamiques) pour afficher les informations des Pokémon : `HoloPokemonCard`, `SimplePokemonCard`, `TypeBadge`, `StatGauge`.
     - Introduction de la bibliothèque de composants `shadcn/ui` et intégration de ses éléments.
-    - Mise en place d'un contexte `LowSpecContext` pour gérer les performances graphiques (notamment les effets holographiques).
+    - Mise en place d'un contexte `LowSpecContext` pour gérer les performances graphiques via un toggle switch (notamment les effets holographiques).
 
 4.  **Améliorations de l'Interface Utilisateur et Fonctionnalités (Commits `3506efc` à `0b38364`, `ab85ef0` à `88e871f`, `ea46290` à `5a83800`, `9ecb596`)**
 
@@ -49,32 +51,34 @@ Le développement de PokeNextTool a suivi plusieurs phases itératives, reflét�
     - Implémentation du filtrage et du tri des Pokémon sur la page d'accueil.
     - Mise en place d'un sélecteur de thème (clair/sombre) avec un provider personnalisé.
     - Refactorisation et améliorations du typage.
-    - Externalisation et optimisation des styles CSS.
+    - Externalisation et optimisation des styles CSS (suppression des inline styles)
 
-5.  **Optimisation et Portabilité (StackBlitz) (Commits `5bab240`, `72340e9`)**
+5.  **Optimisation et Configuration pour StackBlitz (Commits `5bab240`, `72340e9`)**
 
-    - **Implémentation d'un fallback JSON** : C'est une étape cruciale pour assurer la consultation du projet sur des plateformes comme StackBlitz où une connexion à une base de données PostgreSQL n'est pas toujours aisée à configurer pour un simple aperçu. Si la connexion à la base de données échoue (ou si les variables d'environnement ne sont pas définies), l'application charge désormais les données depuis un fichier `pokedex_export.json` local.
+    - **Implémentation d'un fallback JSON** : C'est une étape fondamentale pour assurer la consultation du projet monorepo sur des plateformes comme StackBlitz où une connexion à une base de données externe n'est pas toujours aisée à configurer pour un simple aperçu. Si la connexion à la base de données échoue ou si les variables d'environnement ne sont pas définies, l'application passe d'elle même en fallback et charge les données depuis un fichier `pokedex_export.json` local.
     - Nettoyage du code et mise à jour des commentaires pour une meilleure lisibilité.
 
 6.  **Maintenance et Qualité du Code (Commits `865009f`, `c02c958`, `7cffdcd`, `a565d03`, `e723f3d`, `de736d1`, `9e95650`, `00cfd36`, `dfe79d3`)**
     - Harmonisation du style des commentaires.
+    - Suppression des commentaires de développement non essentiels.
     - Mises à jour des dépendances et configurations (`pnpm-lock.yaml`, `tsconfig.json`).
     - Suppression de code inutile et résolution d'avertissements TypeScript.
+    - Mise en place des console.log pertinents afin de suivre le fonctionnement et traitement des requêtes depuis les devtool's.
 
 ## Fonctionnalités actuelles
 
 - Affichage de la liste des 151 premiers Pokémon avec leurs informations de base et types.
-- Page de détail pour chaque Pokémon affichant ses statistiques.
-- Cartes Pokémon avec un effet holographique (simplifié).
+- Page de détail pour chaque Pokémon affichant ses statistiques, chacune en couleur.
+- Cartes Pokémon avec un effet holographique (simplifié dans la v1).
 - Filtrage des Pokémon par type et par nom.
-- Tri des Pokémon par numéro, nom, PV, attaque, défense.
+- Tri des Pokémon par numéro, nom, PV, attaque, défense (A-Z ou Z-A)
 - Sélecteur de thème (clair/sombre).
 - Mode "Low Spec" pour désactiver les effets graphiques coûteux.
-- Fallback sur données JSON pour une consultation sans base de données.
+- Fallback sur données JSON pour une consultation sans base de données (hors ligne ou version conteneurisée)
 
 ## Objectif StackBlitz
 
-Un effort particulier a été réalisé pour rendre ce projet facilement consultable sur StackBlitz. La principale mesure a été l'implémentation d'un système de **fallback pour la source de données** (commit `5bab240`). Si l'application ne parvient pas à se connecter à la base de données PostgreSQL (ce qui est le cas par défaut dans un environnement comme StackBlitz sans configuration manuelle approfondie), elle se rabat sur la lecture d'un fichier `pokedex_export.json` inclus dans le dépôt. Cela permet à quiconque d'ouvrir le projet sur StackBlitz et de voir l'application fonctionner avec un jeu de données complet sans avoir à configurer une base de données externe.
+Un effort particulier a été réalisé pour rendre ce projet facilement consultable sur StackBlitz. La principale mesure a été l'implémentation d'un système de **fallback pour la source de données** (commit `5bab240`). Si l'application ne parvient pas à se connecter à la base de données PostgreSQL (ce qui est le cas par défaut dans un environnement comme StackBlitz sans configuration manuelle approfondie), elle se rabat sur la lecture d'un fichier `pokedex_export.json` inclus dans le dépôt. Cela permet à quiconque d'ouvrir le projet sur StackBlitz et de voir l'application fonctionner avec un jeu de données complet sans avoir à configurer une base de données externe ou en installant le projet localement sans configuration.
 
 ## Feuille de route et Améliorations futures
 
